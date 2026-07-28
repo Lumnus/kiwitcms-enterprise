@@ -25,8 +25,8 @@ RUN pip install --no-cache-dir build && python -m build --wheel --outdir /wheels
 FROM docker.io/kiwitcms/kiwi:${KIWI_VERSION}
 
 USER 0
-RUN microdnf -y --nodocs install augeas-libs krb5-libs psmisc xmlsec1 xmlsec1-openssl && \
-    microdnf clean all
+# public kiwitcms/kiwi base is CentOS Stream 10 with dnf (the subscriber `version` base had microdnf).
+RUN dnf -y install augeas-libs krb5-libs psmisc xmlsec1 xmlsec1-openssl && dnf clean all
 
 HEALTHCHECK CMD [ -d /proc/$(cat /tmp/nginx.pid) ] && [ -d /proc/$(cat /tmp/kiwitcms.pid) ]
 
