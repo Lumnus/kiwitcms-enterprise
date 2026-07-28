@@ -38,7 +38,7 @@ USER 0
 # public kiwitcms/kiwi base is CentOS Stream 10 with dnf (the subscriber `version` base had microdnf).
 # runtime libs + the build toolchain for the C-extension deps (gssapi→krb5-devel; python3-saml→xmlsec/libxml2).
 RUN dnf -y install augeas-libs krb5-libs psmisc xmlsec1 xmlsec1-openssl \
-        krb5-devel gcc python3-devel libxml2-devel xmlsec1-devel && dnf clean all
+        krb5-devel gcc python3-devel && dnf clean all
 
 HEALTHCHECK CMD [ -d /proc/$(cat /tmp/nginx.pid) ] && [ -d /proc/$(cat /tmp/kiwitcms.pid) ]
 
