@@ -25,6 +25,7 @@ RUN python -m build --wheel --outdir /wheels          # → /wheels/kiwitcms_ent
 RUN pip wheel --no-deps --no-cache-dir --wheel-dir /wheels \
       git+https://github.com/kiwitcms/github-app@v2.3.0 \
       git+https://github.com/kiwitcms/tenants@v4.7.1 \
+      git+https://github.com/kiwitcms/django-tenants@v3.8.2 \
       git+https://github.com/kiwitcms/trackers-integration@v1.4.0 \
       git+https://github.com/kiwitcms/python-social-auth-kerberos@v0.3.2
 
