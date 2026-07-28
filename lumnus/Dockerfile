@@ -20,7 +20,9 @@ RUN pip install --no-cache-dir build && python -m build --wheel --outdir /wheels
 # → /wheels/kiwitcms_enterprise-16.2-py3-none-any.whl
 
 # ---- stage 2: layer enterprise onto the PUBLIC CE image (mirrors upstream Dockerfile, token-free) ----
-FROM pub.kiwitcms.eu/kiwitcms/kiwi:${KIWI_VERSION}
+# Base pulled via docker.io (routes through our Zot mirror — no rate-limit). `pub.kiwitcms.eu` is a
+# Docker Hub proxy hit WAN-direct by buildkit → 429; docker.io/kiwitcms/kiwi is the same image, mirrored.
+FROM docker.io/kiwitcms/kiwi:${KIWI_VERSION}
 
 USER 0
 RUN microdnf -y --nodocs install augeas-libs krb5-libs psmisc xmlsec1 xmlsec1-openssl && \
