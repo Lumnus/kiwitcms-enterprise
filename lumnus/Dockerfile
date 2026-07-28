@@ -9,6 +9,9 @@
 # Single `docker build` → fits ci-build (the two-phase-build-gap cure, fork-build-publish.md).
 # Enterprise version == 16.2 == the base CE version (checked: `setup.py --version`).
 
+# Global ARG — must precede ALL FROMs to be usable in a stage's FROM line (buildkit ARG-in-FROM rule).
+ARG KIWI_VERSION=latest
+
 # ---- stage 1: build the kiwitcms_enterprise wheel from source (pure-python; no private index) ----
 FROM python:3.12-slim AS wheelbuild
 WORKDIR /src
@@ -17,7 +20,6 @@ RUN pip install --no-cache-dir build && python -m build --wheel --outdir /wheels
 # → /wheels/kiwitcms_enterprise-16.2-py3-none-any.whl
 
 # ---- stage 2: layer enterprise onto the PUBLIC CE image (mirrors upstream Dockerfile, token-free) ----
-ARG KIWI_VERSION=latest
 FROM pub.kiwitcms.eu/kiwitcms/kiwi:${KIWI_VERSION}
 
 USER 0
