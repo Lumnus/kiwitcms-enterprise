@@ -12,12 +12,21 @@
 # Global ARG — must precede ALL FROMs to be usable in a stage's FROM line (buildkit ARG-in-FROM rule).
 ARG KIWI_VERSION=latest
 
-# ---- stage 1: build the kiwitcms_enterprise wheel from source (pure-python; no private index) ----
+# ---- stage 1: build the enterprise wheel + the 4 moat deps from PUBLIC GitHub source tags ----
+# The moat is ONLY the wheel-publishing lag on public PyPI — the source tags ARE public (AGPL).
+# We build them ourselves for self-use (no redistribution of a custom EE build).
 FROM python:3.12-slim AS wheelbuild
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir build
 WORKDIR /src
 COPY . /src
-RUN pip install --no-cache-dir build && python -m build --wheel --outdir /wheels
-# → /wheels/kiwitcms_enterprise-16.2-py3-none-any.whl
+RUN python -m build --wheel --outdir /wheels          # → /wheels/kiwitcms_enterprise-16.2-*.whl
+# the 4 private-index-only pins, built from their public AGPL source tags
+RUN pip wheel --no-deps --no-cache-dir --wheel-dir /wheels \
+      git+https://github.com/kiwitcms/github-app@v2.3.0 \
+      git+https://github.com/kiwitcms/tenants@v4.7.1 \
+      git+https://github.com/kiwitcms/trackers-integration@v1.4.0 \
+      git+https://github.com/kiwitcms/python-social-auth-kerberos@v0.3.2
 
 # ---- stage 2: layer enterprise onto the PUBLIC CE image (mirrors upstream Dockerfile, token-free) ----
 # Base pulled via docker.io (routes through our Zot mirror — no rate-limit). `pub.kiwitcms.eu` is a
